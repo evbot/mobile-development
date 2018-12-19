@@ -1,7 +1,7 @@
 #### 一、摘要
 Gradle目前作为Android的默认构建工具，Gradle通过提供DSL指令和Gradle插件等完成Android的编译。Gradle为了很好的描述构建，它提供了基于Groovy的DSL，但增加了一些特殊处理，以便在利用Groovy语言特性的之外，让它更像一个构建语言。如果想知道settings.gradle、build.gradle等的一些配置，需要了解Groovy知识。
 #### 二、Groovy语法
-[关于Groovy语法可以参考精通Groovy](https://www.ibm.com/developerworks/cn/education/java/j-groovy/j-groovy.html)<br />
+关于Groovy语法可以参考[IBM的教程](https://www.ibm.com/developerworks/cn/education/java/j-groovy/j-groovy.html)或者[W3C学院](https://www.w3cschool.cn/groovy/groovy_object_oriented.html)<br/>
 ##### 2.1 Groovy简介
 Groovy语言对Java语言的进行了拓展，它提供了更简单、更灵活的语法，可以在运行时动态地进行类型检查。Java语言语法都适用于Groovy语言，Groovy也可以和Java进行混编。与Java相比，Groovy带来的快捷方式：
 - Groovy 松散的Java语法允许省略分号和修改符。
