@@ -98,7 +98,8 @@ println aRange.getTo()    // 5
 groovy中的一个核心语法：closurs，也叫闭包。闭包在groovy中是一个处于代码上下文中的开放的，匿名代码块。它可以访问到其外部的变量或方法。
 - 闭包定义
 ```Java
-{ [closureParameters -> ] statements } //其中[]内是可选的闭包参数，可省略。当闭包带有参数，就需要->来将参数和闭包体相分离。
+//其中[]内是可选的闭包参数，可省略。当闭包带有参数，就需要->来将参数和闭包体相分离。
+{ [closureParameters -> ] statements } 
 //闭包的具体例子
 { item++ }                                          
 { -> item++ }                                       
@@ -139,11 +140,141 @@ def greeting = { "Hello, $it!" }
 assert greeting('Patrick') == 'Hello, Patrick!'
 ```
 - 闭包的委托策略
+	* 在闭包中有三个引用对象的关键字：this,owner,delegete。委托策略是指：在闭包中写的属性或者方法，默认绑定到哪个对象上
+	* 三种关键字说明：
+		* this: 代表闭包的外部类
+		* owner: 默认情况与this相似，但是ownner可以代表类，也可以代表闭包对象
+		* delegete: 默认情况等同于owner,但是我们可以动态改变这个值让闭包内的属性和方法代表不同的意义
+	* 可以用闭包对象的resolveStrategy 来改变代理策略，常见的值
+		* Closure.OWNER_FIRST：默认策略，如果闭包里的属性或者方法优先调用owner中的，如果owner不存在则调用delegete中的
+		* Closure.DELEGATE_FIRST 属性或方法优先使用delegete中，如果不存在，则使用owner中的
+		* Closure.OWNER_ONLY 属性或方法仅仅在owner里寻找，delegete中存在的将被忽略
+		* Closure.DELEGATE_ONLY 属性或方法仅仅在delegete里寻找，delegete中存在的将被忽略
 ```Java
-this 表示定义闭包的外围类。
-owner 表示定义闭包的直接外围对象，可以是类或者闭包。
-delegate 表示一个用于处理方法调用和属性处理的第三方类。
+static def person(Closure<Person> closure) {
+    Person p = new Person()
+    closure.delegate = p
+    closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    closure(p)
+}
+class Person {
+    String name
+    String age
+    def dumpPerson() {
+        println "name is ${name},age is ${age}"
+    }
+}
+task hello {
+    person {
+        name = "momo"
+        age = "18"
+        dumpPerson()
+    }
+}
+```
+```Java
+package com.evbot.gradle.study
+
+class GroovyTest {
+    def name
+    def age
+    def getName() {
+        return name
+    }
+    void setName(name) {
+        this.name = name
+    }
+    def getAge() {
+        return age
+    }
+    void setAge(age) {
+        this.age = age
+    }
+    //闭包 this owner delegate 的相同情况下演示
+    def testClosure1() {
+        def closure1 = {
+            println owner
+            println this
+            println delegate
+        }
+        closure1.call()
+    }
+    // 嵌套闭包时 this owner delegate区别演示
+    // 注意：此时this代表了类
+    // 而owner代表了闭包对象
+    def testClosure2() {
+        def closure2 = {
+            def test = {
+                println this
+                println owner
+                println delegate
+            }
+            test()
+        }
+        closure2()
+    }
+
+    // 代理对象演示，注意在闭包内定义的date属性如果不指定其代理一定会报错，因为owner中没有date属性
+    def testClosure3() {
+        def closure3 = {
+            def test = {
+                date = "2018-11-12"
+                println(date)
+            }
+            test()
+        }
+        GroovyTest1 groovyTest1 = new GroovyTest1()
+        closure3.delegate = groovyTest1
+        closure3()
+    }
+}
+class GroovyTest1 {
+    def name
+    def date
+    def getName() {
+        return name
+    }
+    void setName(name) {
+        this.name = name
+    }
+    def getDate() {
+        return date
+    }
+    void setDate(date) {
+        this.date = date
+    }
+}
+
+def test = new GroovyTest()
+test.testClosure1()
+println()
+test.testClosure2()
+println()
+test.testClosure3()
+
+//输出结果
+com.evbot.gradle.study.GroovyTest@23f7d05d
+com.evbot.gradle.study.GroovyTest@23f7d05d
+com.evbot.gradle.study.GroovyTest@23f7d05d
+
+com.evbot.gradle.study.GroovyTest@23f7d05d
+com.evbot.gradle.study.GroovyTest$_testClosure2_closure2@2a32de6c
+com.evbot.gradle.study.GroovyTest$_testClosure2_closure2@2a32de6c
+
+2018-11-12
 ```
 ##### 2.7 Groovy类
-
+在Groovy中，如在任何其他面向对象语言中一样，存在类和对象的概念以表示编程语言的对象定向性质。Groovy类是数据的集合和对该数据进行操作的方法。在一起，类的数据和方法用于表示问题域中的一些现实世界对象。Groovy中的类声明了该类定义的对象的状态（数据）和行为。因此，Groovy类描述了该类的实例字段和方法。以下是Groovy中的一个类的示例。类的名称是Student，它有两个字段 - StudentID和StudentName。在main函数中，我们创建一个这个类的对象，并将值分配给对象的StudentID和StudentName。
+```Java
+class Student {
+   int StudentID;
+   String StudentName;
+	
+   static void main(String[] args) {
+      Student st = new Student();
+      st.StudentID = 1;
+      st.StudentName = "Joe"     
+   } 
+}
+```
 
