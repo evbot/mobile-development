@@ -278,3 +278,7 @@ class Student {
 }
 ```
 
+#### 三、Gradle详解
+Android studio中的android项目具体用什么版本的gradle，可以在android项目的根目录下的gradle/wraaper/gradle-wrapper.properties文件中进行配置。注意：gradle与com.android.tools.build:gradle插件库之间版本的对应关系。从[Android官网](https://developer.android.google.cn/studio/releases/gradle-plugin)可以查到它们之间的对应关系。
+Android构建项目的详细过程可以参考[简书上一片博客](https://www.jianshu.com/p/804d79415258)
+
